@@ -18,7 +18,7 @@ const saveOrUpdateUser = function(userName, firstName, lastName, picUrl, verifie
                 newUser.save().then(() => resolve(authToken));
             } else {
                 user.authToken = authToken;
-                user.save().then(() => resolve(authToken))
+                user.save().then(() => resolve(authToken));
             }
         }).catch(err => {
             reject(err)

@@ -1,5 +1,6 @@
 const { OAuth2Client } = require('google-auth-library');
 const authService = require('./service.auth');
+const errorCodes = require('../../../const/errorCodes');
 
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -7,7 +8,8 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // handles google user authentication using token provided from frontend
 // return a authToken to be used for logged in users
-const handleAuthenticationRequest = async (req, res) => {
+const handleGoogleAuthenticationRequest = async (req, res) => {
+    let error = null;
     try {
         let idToken;
         if (req.headers.authorization &&
@@ -23,22 +25,26 @@ const handleAuthenticationRequest = async (req, res) => {
             authService.saveOrUpdateUser(email, given_name, family_name, picture, 'google').then(token => {
                 res.send({
                     status: 1,
-                    authToken: token
+                    data: token
                 })
             }).catch(err => {
-                console.log('error in saving in db', err);
-                throw new Error('Something went wrong.');
+                error = errorCodes.DATABASE_ERROR;
+                throw new Error(err);
             })
 
         } else {
-            throw new Error('Token not found!')
+            error = errorCodes.TOKEN_NOT_FOUND;
+            throw new Error('Token not found!');
         }
 
     } catch (err) {
-        console.log('error', err);
+        console.error('Error in authentication :: ', err);
+        if(!error){
+            error = errorCodes.INVALID_TOKEN;
+        }
         res.status(401).send({
             status: 0,
-            message: err
+            errorMessage: error
         })
     }
 
@@ -50,4 +56,4 @@ const handleAuthenticationRequest = async (req, res) => {
 
 }
 
-module.exports = { handleAuthenticationRequest }
+module.exports = { handleGoogleAuthenticationRequest }
