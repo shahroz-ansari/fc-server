@@ -5,7 +5,7 @@ var logger = require('morgan');
 var pouchHandle = require('./config/express-pouch')
 require('./config/mongoose')();
 
-var appRoutes = require('./appR')
+var router = require('./routes');
 
 var app = express();
 
@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/fc', appRoutes)
+app.use('/fc', router.appRouter)
 
 if (process.env.ENVIRONMENT === 'development') {
     app.use('/', pouchHandle);
