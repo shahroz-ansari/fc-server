@@ -5,8 +5,6 @@ var logger = require('morgan');
 var cors = require('cors');
 require('./config/mongoose')();
 
-require('./services')
-
 var appRoutes = require('./routes');
 
 var app = express();
