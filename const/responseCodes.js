@@ -1,5 +1,6 @@
-export const invalidRequest = 'invalid_request';
-export const invalidToken = 'invalid_token';
-export const internalServerError = 'internal_server_error';
-export const pageNotFound = 'page_not_found';
-
+module.exports = {
+    invalidRequest: 'invalid_request',
+    invalidToken: 'invalid_token',
+    internalServerError: 'internal_server_error',
+    pageNotFound: 'page_not_found',
+}
