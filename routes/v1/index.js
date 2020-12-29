@@ -1,10 +1,10 @@
 var express = require('express');
-var auth = require('./auth');
+var authRoutes = require('./auth');
 
 
-var v1Router = express.Router();
+var router = express.Router();
 
 //auth routes
-v1Router.use('/auth', auth.authRoutes);
+router.use('/auth', authRoutes);
 
-module.exports = { v1Router }
+module.exports = router
