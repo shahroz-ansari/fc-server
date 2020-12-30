@@ -7,9 +7,12 @@ class Encryption {
     encrypt(data, secret=false) {
         if (!data) throw new Error('No data available to encrypt');
         if (!secret && !this.secretKey) throw new Error('Secret key not available')
-        if (!secret || !this.secretKey) secret = this.secretKey;
+        if (!secret) secret = this.secretKey;
+        
         let iv = crypto.randomBytes(16);
+        console.log(data, secret);
         let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(secret), iv);
+        
         let encrypted = cipher.update(data);
         encrypted = Buffer.concat([encrypted, cipher.final()]);
         return iv.toString('hex') + ':' + encrypted.toString('hex');
