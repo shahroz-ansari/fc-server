@@ -16,7 +16,7 @@ module.exports = [
         "filters": {
             'only_mine': String(
                 function(doc, req) {
-                    if(Array.isArray(doc.friendOf) && doc.friendOf.indexOf(req['userCtx']['name']) > -1) {
+                    if(Array.isArray(doc.connections) && doc.connections.indexOf(req['userCtx']['name']) > -1) {
                         return true
                     }
                     return false

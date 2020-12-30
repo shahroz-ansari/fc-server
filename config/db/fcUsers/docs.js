@@ -5,7 +5,7 @@ module.exports = [
         firstName: 'userA',
         lastName: 'lastuserA',
         picture: 'https://picsum.photos/200',
-        friendOf: ['userB', 'userC'],
+        connections: ['userB', 'userC'],
     },
     {
         _id: 'userB:'+ Date.now(),
@@ -13,7 +13,7 @@ module.exports = [
         firstName: 'userB',
         lastName: 'lastuserB',
         picture: 'https://picsum.photos/200',
-        friendOf: ['userC', 'userA']
+        connections: ['userC', 'userA']
     },
     {
         _id: 'userC:'+ Date.now(),
@@ -21,7 +21,7 @@ module.exports = [
         firstName: 'userC',
         lastName: 'lastuserC',
         picture: 'https://picsum.photos/200',
-        friendOf: ['userB']
+        connections: ['userB']
     },
     {
         _id: 'userD:'+ Date.now(),
@@ -29,7 +29,7 @@ module.exports = [
         firstName: 'userD',
         lastName: 'lastuserD',
         picture: 'https://picsum.photos/200',
-        friendOf: ['userB']
+        connections: ['userB']
     },
     {
         _id: 'userE:'+ Date.now(),
@@ -37,7 +37,7 @@ module.exports = [
         firstName: 'userE',
         lastName: 'lastuserE',
         picture: 'https://picsum.photos/200',
-        friendOf: []
+        connections: []
     },
     {
         _id: 'userF:'+ Date.now(),
@@ -45,7 +45,7 @@ module.exports = [
         firstName: 'userF',
         lastName: 'lastuserF',
         picture: 'https://picsum.photos/200',
-        friendOf: []
+        connections: []
     },
     {
         _id: 'userG:'+ Date.now(),
@@ -53,7 +53,7 @@ module.exports = [
         firstName: 'userG',
         lastName: 'lastuserG',
         picture: 'https://picsum.photos/200',
-        friendOf: []
+        connections: []
     },
     {
         _id: 'userH:'+ Date.now(),
@@ -61,7 +61,7 @@ module.exports = [
         firstName: 'userH',
         lastName: 'lastuserH',
         picture: 'https://picsum.photos/200',
-        friendOf: []
+        connections: []
     },
     {
         _id: 'userI:'+ Date.now(),
@@ -69,6 +69,6 @@ module.exports = [
         firstName: 'userI',
         lastName: 'lastuserI',
         picture: 'https://picsum.photos/200',
-        friendOf: []
+        connections: []
     }
 ]
