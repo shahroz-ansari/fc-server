@@ -10,7 +10,6 @@ class Encryption {
         if (!secret) secret = this.secretKey;
         
         let iv = crypto.randomBytes(16);
-        console.log(data, secret);
         let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(secret), iv);
         
         let encrypted = cipher.update(data);
