@@ -1,9 +1,20 @@
 const CouchDB = require("../../config/db");
-const { v4 } = require("uuid");
 
 class FcUsersDB extends CouchDB {
     constructor(dbName) {
         super(dbName)
+    }
+
+    getFcUserById(userFcId) {
+        return new Promise(async (resolve, reject) => {
+            if (!userFcId) {
+                reject(new Error('userFcId is required.'))
+                return;
+            }
+
+            let user = await this.get(`/fcuser::${userFcId}`);
+            resolve(user);
+        })
     }
 
     // @user should contain firstName or lastName
@@ -26,13 +37,9 @@ class FcUsersDB extends CouchDB {
                 connections: [userFcId]
             }
 
-            const resp = await this.put(`/fcuser::${userFcId}`, fcUser);
+            const newFcUser = await this.put(`/fcuser::${userFcId}`, fcUser);
             
-            if (resp.error) {
-                reject(new Error(resp.error));
-                return;
-            }
-            resolve(resp);
+            resolve(newFcUser);
         })
     }
 }
