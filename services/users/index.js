@@ -10,30 +10,25 @@ class UsersDB extends CouchDB {
         return this.get('/_all_docs');
     }
 
-    async createNewUser(username) {
+    async getUserById(userFcId) {
         return new Promise(async (resolve, reject) => {
-            if (!username) {
-                reject(new Error('username is required.'))
+            if (!userFcId) {
+                reject(new Error('userFcId is required.'))
                 return;
             }
-            const userFcId = getUserFcId(username);
-            // get user by userFcId
+
             let user = await this.get(`/org.couchdb.user:${userFcId}`);
+            resolve(user);
+        })
+    }
 
-            // failed to get user
-            if (user.error && user.error !== 'not_found') {
-                console.log(user);
-                reject(new Error('Failed to fetch user.'))
+    async createNewUser(userFcId, username) {
+        return new Promise(async (resolve, reject) => {
+            if (!username || !userFcId) {
+                reject(new Error('username and userFcId is required.'))
                 return;
             }
 
-            // user already exist
-            if (user && !user.error) {
-                resolve(user);
-                return;
-            }
-
-            // create a new user
             const password = generatePasswordHash(userFcId);
             user = await this.put(`/org.couchdb.user:${userFcId}`, {
                 name: userFcId,
@@ -42,20 +37,6 @@ class UsersDB extends CouchDB {
                 roles: ['user'],
                 password
             })
-            // reject if failed creating new user.
-            if (user.error) {
-                console.log(user);
-                reject(new Error('User not created.'));
-                return;
-            }
-            // fetch newly created user
-            user = await this.get(`/${user.id}`);
-            if (user.error) {
-                console.log(user);
-                reject(new Error('Unable to read newly created user.'));
-                return;
-            }
-            // resolve user created successfully
             resolve(user);
         })
     }
