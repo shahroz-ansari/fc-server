@@ -1,73 +1,77 @@
 const { invalidToken, tokenNotFound, databaseError } = require('../../../const/responseCodes');
 const { googleAuthService, usersDB, fcUsersDB } = require('../../../services');
 const { generatePasswordHash, getUserFcId } = require('../../../utils/app');
-const utils = require('../../../utils/app');
+const { getSyncGatawayCreds } = require('../../../utils/db');
+const FcError = require('../../../utils/error');
 
 
 // handles google user authentication using token provided from frontend
 // return a authToken to be used for logged in users
 const handleGoogleAuthenticationRequest = async (req, res) => {
 
-    const token = req.headers.authorization;
-    if (token && token.startsWith('Bearer')) {
+    try {
+        const token = req.headers.authorization;
+        if (!token || !token.startsWith('Bearer')) throw new FcError(tokenNotFound, 400);
         const idToken = token.split(' ')[1];
-        if (!idToken) {
-            res.locals.error(tokenNotFound,400);
-        } else {
-            //getting user profile details from google service
-            const { email, picture, firstName, lastName } = await googleAuthService.verify(idToken);
-            if (!email) {
-                res.locals.error(invalidToken,400);
-            } else {
-                try {
-                    const userFcId = getUserFcId(email);
-                    const { COUCH_DB_PROTOCOL, COUCH_DB_HOST, COUCH_DB_PORT } = process.env;
+        if (!idToken) throw new FcError(tokenNotFound, 400);
 
-                    //getting user from _users db using userFcId
-                    let user = await usersDB.getUserById(userFcId);
+        //getting user profile details from google service
+        const { email, picture, firstName, lastName } = await googleAuthService.verify(idToken);
+        if (!email) throw new FcError(invalidToken, 400);
 
-                    //if user is not found creating new user
-                    if (!user || user.error === 'not_found') {
-                        user = await usersDB.createNewUser(userFcId, email);
-                    }
+        const userFcId = getUserFcId(email);
 
-                    //getting fcUser from fc_users db
-                    let fcUser = await fcUsersDB.getFcUserById(userFcId);
+        //getting user from _users db using userFcId
+        let user = await usersDB.getUserById(userFcId);
 
-                    //if fcUser is not found creating new fcUser
-                    if (!fcUser || fcUser.error === 'not_found') {
-                        const userData = {
-                            firstName,
-                            lastName,
-                            picture
-                        }
-                        await fcUsersDB.addFcUser(userFcId, userData);
-                    }
-                    const password = generatePasswordHash(userFcId);
-                    const data =
-                    {
-                        userFcId,
-                        userName: email,
-                        firstName,
-                        lastName,
-                        syncGatewayProtocol: COUCH_DB_PROTOCOL,
-                        syncGatewayHost: COUCH_DB_HOST,
-                        syncGatewayPort: COUCH_DB_PORT,
-                        syncGatewayUser: user.name,
-                        syncGatewayPass: password
-                        // token
-                    }
-                    res.locals.send(data);
-                } catch (err) {
-                    console.error('error in database operation', err);
-                    res.locals.error(databaseError);
-                }
+        //if user is not found creating a new user
+        if (!user || user.error === 'not_found') {
+            user = await usersDB.createNewUser(userFcId, email);
+            if (!user || user.error) {
+                console.error('errror in create new _user', user);
+                throw new FcError(databaseError,404);
             }
         }
 
-    } else {
-        res.locals.error(tokenNotFound,400);
+        //getting fcUser from fc_users db
+        let fcUser = await fcUsersDB.getFcUserById(userFcId);
+
+        //if fcUser is not found creating new fcUser
+        if (!fcUser || fcUser.error === 'not_found') {
+            const userData = {
+                firstName,
+                lastName,
+                picture
+            }
+            const newfcUser = await fcUsersDB.addFcUser(userFcId, userData);
+            if (!newfcUser || newfcUser.error) {
+                console.error('errror in create new fcuser', newfcUser);
+
+                // To do : delete user from _users db
+                throw new FcError(databaseError,404);
+            }
+        }
+        const syncGatewayCreds = getSyncGatawayCreds(user.name, generatePasswordHash(userFcId));
+        const data =
+        {
+            ...syncGatewayCreds,
+            userFcId,
+            userName: email,
+            firstName,
+            lastName,
+        }
+        res.locals.send(data);
+
+    } catch (err) {
+        if (err instanceof FcError) {
+            res.locals.error(err);
+        }
+        else {
+            console.error('error in database operation', err);
+            res.locals.error({ message: databaseError, status: 404 })
+        }
     }
+
 }
 
 
