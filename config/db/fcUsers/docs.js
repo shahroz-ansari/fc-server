@@ -1,74 +1,76 @@
+const { getUserFcId } = require("../../../utils/app");
+
 module.exports = [
     {
-        _id: 'userA:'+ Date.now(),
-        userFcId: 'userA',
+        _id: 'fcuser::' + getUserFcId('userA@gmail.com'),
+        userFcId: getUserFcId('userA@gmail.com'),
         firstName: 'userA',
         lastName: 'lastuserA',
         picture: 'https://picsum.photos/200',
-        connections: ['userB', 'userC'],
+        connections: [getUserFcId('userA@gmail.com'), getUserFcId('userB@gmail.com'), getUserFcId('userC@gmail.com')],
     },
     {
-        _id: 'userB:'+ Date.now(),
-        userFcId: 'userB',
+        _id: 'fcuser::' + getUserFcId('userB@gmail.com'),
+        userFcId: getUserFcId('userB@gmail.com'),
         firstName: 'userB',
         lastName: 'lastuserB',
         picture: 'https://picsum.photos/200',
-        connections: ['userC', 'userA']
+        connections: [getUserFcId('userB@gmail.com'), getUserFcId('userC@gmail.com'), getUserFcId('userA@gmail.com')]
     },
     {
-        _id: 'userC:'+ Date.now(),
-        userFcId: 'userC',
+        _id: 'fcuser::' + getUserFcId('userC@gmail.com'),
+        userFcId: getUserFcId('userC@gmail.com'),
         firstName: 'userC',
         lastName: 'lastuserC',
         picture: 'https://picsum.photos/200',
-        connections: ['userB']
+        connections: [getUserFcId('userC@gmail.com'), getUserFcId('userB@gmail.com')]
     },
     {
-        _id: 'userD:'+ Date.now(),
-        userFcId: 'userD',
+        _id: 'fcuser::' + getUserFcId('userD@gmail.com'),
+        userFcId: getUserFcId('userD@gmail.com'),
         firstName: 'userD',
         lastName: 'lastuserD',
         picture: 'https://picsum.photos/200',
-        connections: ['userB']
+        connections: [getUserFcId('userD@gmail.com'), getUserFcId('userB@gmail.com')]
     },
     {
-        _id: 'userE:'+ Date.now(),
-        userFcId: 'userE',
+        _id: 'fcuser::' + getUserFcId('userE@gmail.com'),
+        userFcId: getUserFcId('userE@gmail.com'),
         firstName: 'userE',
         lastName: 'lastuserE',
         picture: 'https://picsum.photos/200',
-        connections: []
+        connections: [getUserFcId('userE@gmail.com')]
     },
     {
-        _id: 'userF:'+ Date.now(),
-        userFcId: 'userF',
+        _id: 'fcuser::' + getUserFcId('userF@gmail.com'),
+        userFcId: getUserFcId('userF@gmail.com'),
         firstName: 'userF',
         lastName: 'lastuserF',
         picture: 'https://picsum.photos/200',
-        connections: []
+        connections: [getUserFcId('userF@gmail.com')]
     },
     {
-        _id: 'userG:'+ Date.now(),
-        userFcId: 'userG',
+        _id: 'fcuser::' + getUserFcId('userG@gmail.com'),
+        userFcId: getUserFcId('userG@gmail.com'),
         firstName: 'userG',
         lastName: 'lastuserG',
         picture: 'https://picsum.photos/200',
-        connections: []
+        connections: [getUserFcId('userGgmail.com')]
     },
     {
-        _id: 'userH:'+ Date.now(),
-        userFcId: 'userH',
+        _id: 'fcuser::' + getUserFcId('userH@gmail.com'),
+        userFcId: getUserFcId('userH@gmail.com'),
         firstName: 'userH',
         lastName: 'lastuserH',
         picture: 'https://picsum.photos/200',
-        connections: []
+        connections: [getUserFcId('userH@gmail.com')]
     },
     {
-        _id: 'userI:'+ Date.now(),
-        userFcId: 'userI',
+        _id: 'fcuser::' + getUserFcId('userI@gmail.com'),
+        userFcId: getUserFcId('userI@gmail.com'),
         firstName: 'userI',
         lastName: 'lastuserI',
         picture: 'https://picsum.photos/200',
-        connections: []
+        connections: [getUserFcId('useri@gmail.com')]
     }
 ]
