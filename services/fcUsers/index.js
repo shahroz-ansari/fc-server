@@ -34,6 +34,7 @@ class FcUsersDB extends CouchDB {
                 firstName: user.firstName || '',
                 lastName: user.lastName || '',
                 picture: user.picture || '',
+                userFcId: userFcId,
                 connections: [userFcId]
             }
 

@@ -30,13 +30,13 @@ class UsersDB extends CouchDB {
             }
 
             const password = generatePasswordHash(userFcId);
-            user = await this.put(`/org.couchdb.user:${userFcId}`, {
+            const user = await this.put(`/org.couchdb.user:${userFcId}`, {
                 name: userFcId,
                 username,
                 type: 'user',
                 roles: ['user'],
                 password
-            })
+            });
             resolve(user);
         })
     }
