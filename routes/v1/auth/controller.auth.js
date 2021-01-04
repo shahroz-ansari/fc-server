@@ -1,25 +1,23 @@
-const { OAuth2Client } = require('google-auth-library');
-const { invalidToken, tokenNotFound, databaseError, invalidRequest } = require('../../../const/responseCodes');
+const { invalidToken, tokenNotFound, databaseError } = require('../../../const/responseCodes');
 const { googleAuthService, usersDB, fcUsersDB } = require('../../../services');
 const { generatePasswordHash, getUserFcId } = require('../../../utils/app');
 const utils = require('../../../utils/app');
 
 
-
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 // handles google user authentication using token provided from frontend
 // return a authToken to be used for logged in users
 const handleGoogleAuthenticationRequest = async (req, res) => {
 
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        const idToken = req.headers.authorization.split(' ')[1];
+    const token = req.headers.authorization;
+    if (token && token.startsWith('Bearer')) {
+        const idToken = token.split(' ')[1];
         if (!idToken) {
-            res.locals.error(tokenNotFound);
+            res.locals.error(tokenNotFound,400);
         } else {
             //getting user profile details from google service
             const { email, picture, firstName, lastName } = await googleAuthService.verify(idToken);
             if (!email) {
-                res.locals.error(invalidToken);
+                res.locals.error(invalidToken,400);
             } else {
                 try {
                     const userFcId = getUserFcId(email);
@@ -68,7 +66,7 @@ const handleGoogleAuthenticationRequest = async (req, res) => {
         }
 
     } else {
-        res.locals.error(invalidRequest);
+        res.locals.error(tokenNotFound,400);
     }
 }
 
