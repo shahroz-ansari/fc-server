@@ -1,10 +1,14 @@
-var express = require('express');
-var authRoutes = require('./auth');
+const express = require('express');
+const authRoutes = require('./auth');
+const dbRoutes = require('./db');
 
 
-var router = express.Router();
+const router = express.Router();
 
 //auth routes
 router.use('/auth', authRoutes);
+
+//db routes
+router.use('/db', dbRoutes);
 
 module.exports = router
