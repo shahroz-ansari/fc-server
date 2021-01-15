@@ -72,11 +72,11 @@ class CouchDB {
 
     // design doc only get update when project started using env COUCH_DB_UPDATE_DESIGN_DOC=YES
     async updateDesignDocument() {
-        designMap[this.dbName].map( async doc => {
+        designMap[this.dbName].map(async doc => {
             const designDoc = await this.get(`/${doc._id}`);
-            if(designDoc.error && designDoc.error === 'not_found') {
+            if (designDoc.error && designDoc.error === 'not_found') {
                 await this.put(`/${doc._id}`, doc);
-            } else if(!designDoc.error && process.env.COUCH_DB_UPDATE_DESIGN_DOC === 'YES') {
+            } else if (!designDoc.error && process.env.COUCH_DB_UPDATE_DESIGN_DOC === 'YES') {
                 doc._rev = designDoc._rev
                 await this.put(`/${doc._id}`, doc);
             }
@@ -101,7 +101,7 @@ class CouchDB {
                 headers: { 'Content-Type': 'application/json' }
             })
             return resp.json();
-        } catch(err) {
+        } catch (err) {
             console.log(err);
             return {
                 error: err.message,
@@ -117,7 +117,7 @@ class CouchDB {
                 headers: { 'Content-Type': 'application/json' }
             })
             return resp.json();
-        } catch(err) {
+        } catch (err) {
             console.log(err);
             return {
                 error: err.message
@@ -133,7 +133,7 @@ class CouchDB {
                 headers: { 'Content-Type': 'application/json' }
             })
             return resp.json();
-        } catch(err) {
+        } catch (err) {
             console.log(err);
             return {
                 error: err.message

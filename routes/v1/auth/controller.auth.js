@@ -16,7 +16,10 @@ const handleGoogleAuthenticationRequest = async (req, res) => {
         if (!idToken) throw new FcError(tokenNotFound, 400);
 
         //getting user profile details from google service
-        const { email, picture, firstName, lastName } = await googleAuthService.verify(idToken);
+
+        const payload = await googleAuthService.verify(idToken);
+        if (!payload) throw new FcError(invalidToken, 400);
+        const { email, picture, firstName, lastName } = payload;
         if (!email) throw new FcError(invalidToken, 400);
 
         const userFcId = getUserFcId(email);
@@ -29,7 +32,7 @@ const handleGoogleAuthenticationRequest = async (req, res) => {
             user = await usersDB.createNewUser(userFcId, email);
             if (!user || user.error) {
                 console.error('errror in create new _user', user);
-                throw new FcError(databaseError,404);
+                throw new FcError(databaseError, 404);
             }
         }
 
@@ -48,7 +51,7 @@ const handleGoogleAuthenticationRequest = async (req, res) => {
                 console.error('errror in create new fcuser', newfcUser);
 
                 // To do : delete user from _users db
-                throw new FcError(databaseError,404);
+                throw new FcError(databaseError, 404);
             }
         }
         const syncGatewayCreds = getSyncGatawayCreds(user.name, generatePasswordHash(userFcId));
