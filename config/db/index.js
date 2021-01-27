@@ -27,11 +27,11 @@ class CouchDB {
     dbURL;
     dbName;
 
-    constructor(dbName) {
+    constructor(dbName, autoDbInit = true) {
         this.dbName = dbName;
         this.dbURL = generateDbUrl(dbName);
 
-        this.dbInit();
+        autoDbInit && this.dbInit();
     }
 
     async dbInit() {
@@ -58,7 +58,6 @@ class CouchDB {
     }
 
     async updateDBSecurity() {
-        if(this.dbName !== 'fc_users' || this.dbName !== 'fc_groups') return;
         await this.put('/_security', {
             "admins": {
                 "names": [],
@@ -73,7 +72,6 @@ class CouchDB {
 
     // design doc only get update when project started using env COUCH_DB_UPDATE_DESIGN_DOC=YES
     async updateDesignDocument() {
-        if(!designMap[this.dbName]) return;
         designMap[this.dbName].map(async doc => {
             const designDoc = await this.get(`/${doc._id}`);
             if (designDoc.error && designDoc.error === 'not_found') {
@@ -86,7 +84,6 @@ class CouchDB {
     }
 
     async uploadInitalDocs() {
-        if(!initalDocsMap[this.dbName]) return;
         console.log('Loading docs...', this.dbName)
         const uploadedDocs = await this.post('/_bulk_docs', {
             docs: initalDocsMap[this.dbName]

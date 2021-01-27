@@ -6,7 +6,6 @@ const FcError = require('../../../utils/error');
 
 // Add invitation in fc_user db 
 const addInvitation = async (req, res) => {
-
     try {
         const { userFcId, groupId, requester } = req.body;
 
@@ -86,7 +85,7 @@ const addInvitation = async (req, res) => {
 
 }
 
-const createChatDb = async (req, res) => {
+const handleNewGroup = async (req, res) => {
     try {
         const { userFcId, groupId } = req.body;
         if (!userFcId || !groupId) {
@@ -104,29 +103,14 @@ const createChatDb = async (req, res) => {
         if (!fcGroup || fcGroup.error === 'not_found') {
             throw new FcError(groupNotFound, 404);
         }
-
         
-        const fcChatDb = new FcChatDB(`chat-${groupId}`);
-
-        //creating groupChat db in case not created in dbInit();
+        const fcChatDb = new FcChatDB(groupId, userFcId);
         await fcChatDb.createDatabase();
 
-        // updating _security of chat_db
-        const securityResponse = await fcChatDb.updateChatDBSecurity(userFcId);
-        if (!securityResponse || securityResponse.error) {
-            throw new FcError(databaseError, 404);
-        }
-        res.locals.send("successfully created ChatDB");
-
+        res.locals.send('ok');
     } catch (err) {
-        if (err instanceof FcError) {
-            res.locals.error(err);
-        }
-        else {
-            console.error('error in database operation', err);
-            res.locals.error({ message: databaseError, status: 404 })
-        }
+        res.locals.error(err)
     }
 }
 
-module.exports = { addInvitation, createChatDb }
+module.exports = { addInvitation, handleNewGroup }

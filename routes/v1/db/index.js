@@ -8,6 +8,6 @@ const router = express.Router();
 router.post('/invitation/add', dbController.addInvitation);
 
 //create group chat db
-router.post('/groupChat/create',dbController.createChatDb);
+router.post('/group/new', dbController.handleNewGroup);
 
 module.exports = router

@@ -1,36 +1,56 @@
 const CouchDB = require("../../config/db");
 
 class FcChatDB extends CouchDB {
-    constructor(dbName) {
-        super(dbName)
+    constructor(groupId, userFcId) {
+        super(`chat_${groupId}`, false)
+        this.userFcId = userFcId
     }
 
-    //update _security of groupChat
-    updateChatDBSecurity(fcUserId) {
+    async createDatabase() {
         return new Promise(async (resolve, reject) => {
-            if (!fcUserId) {
-                reject(new Error('fcUserId is required'));
+            const db = await this.put('');
+            if (db.error) {
+                reject(db)
                 return;
             }
-            let chatDbSecurity = await this.get('_security');
+            try {
+                const security = await this.grantDbAccess(true);
+                if (security.error) {
+                    reject(security);
+                    return;
+                }
+            } catch (err) {
+                reject(err)
+                return;
+            }
+            resolve(db);
+        })
+    }
 
-            if (chatDbSecurity && chatDbSecurity.members && chatDbSecurity.members.names && Array.isArray(chatDbSecurity.members.names)) {
-                chatDbSecurity["members"]["names"] = chatDbSecurity.members.names.concat(fcUserId);
+    async grantDbAccess(init = false) {
+        return new Promise(async (resolve, reject) => {
+            let doc, response;
+            if (!init) {
+                doc = await this.get('/_security')
+                doc["members"]["names"] = doc["members"]["names"].concat(this.userFcId);
             } else {
-                chatDbSecurity = {
-                    "admins": {
-                        "names": [fcUserId],
-                        "roles": ["admin"]
-                    },
-                    "members": {
-                        "names": [fcUserId],
-                        "roles": []
-                    }
+                doc = {
+                    "admins": { "names": [], "roles": ["admin"] },
+                    "members": { "names": [this.userFcId], "roles": [] }
                 }
             }
-            const response = await this.put('/_security', chatDbSecurity);
-            resolve(response);
+
+            response = await this.put('/_security', doc)
+            if (response.error) {
+                reject(response);
+                return;
+            }
+            resolve(response)
         })
+    }
+
+    revokeDbAccess() {
+        
     }
 }
 
