@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const { requiredFieldsMissing, databaseError, userNotFound, groupNotFound, notAuthorized, userAlreadyPresendInGroup, invitationAlreadyPresent, requesterAndUserCantBeSame } = require('../../../const/responseCodes');
-const { fcUsersDB, fcGroupsDB } = require('../../../services');
+const { fcUsersDB, fcGroupsDB, FcChatDB } = require('../../../services');
 const FcError = require('../../../utils/error');
 
 
@@ -86,4 +86,47 @@ const addInvitation = async (req, res) => {
 
 }
 
-module.exports = { addInvitation }
+const createChatDb = async (req, res) => {
+    try {
+        const { userFcId, groupId } = req.body;
+        if (!userFcId || !groupId) {
+            throw new FcError(requiredFieldsMissing, 404);
+        }
+
+        //checking if user exist with userFcId
+        const fcUser = await fcUsersDB.getFcUserById(userFcId);
+        if (!fcUser || fcUser.error === 'not_found') {
+            throw new FcError(userNotFound, 404);
+        }
+
+        //checking if group exist with groupId
+        const fcGroup = await fcGroupsDB.getGroupById(groupId);
+        if (!fcGroup || fcGroup.error === 'not_found') {
+            throw new FcError(groupNotFound, 404);
+        }
+
+        
+        const fcChatDb = new FcChatDB(`chat-${groupId}`);
+
+        //creating groupChat db in case not created in dbInit();
+        await fcChatDb.createDatabase();
+
+        // updating _security of chat_db
+        const securityResponse = await fcChatDb.updateChatDBSecurity(userFcId);
+        if (!securityResponse || securityResponse.error) {
+            throw new FcError(databaseError, 404);
+        }
+        res.locals.send("successfully created ChatDB");
+
+    } catch (err) {
+        if (err instanceof FcError) {
+            res.locals.error(err);
+        }
+        else {
+            console.error('error in database operation', err);
+            res.locals.error({ message: databaseError, status: 404 })
+        }
+    }
+}
+
+module.exports = { addInvitation, createChatDb }
