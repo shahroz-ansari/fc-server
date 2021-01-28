@@ -27,11 +27,11 @@ class CouchDB {
     dbURL;
     dbName;
 
-    constructor(dbName) {
+    constructor(dbName, autoDbInit = true) {
         this.dbName = dbName;
         this.dbURL = generateDbUrl(dbName);
 
-        this.dbInit();
+        autoDbInit && this.dbInit();
     }
 
     async dbInit() {

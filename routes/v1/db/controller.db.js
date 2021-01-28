@@ -1,12 +1,11 @@
 const { v4: uuidv4 } = require('uuid');
 const { requiredFieldsMissing, databaseError, userNotFound, groupNotFound, notAuthorized, userAlreadyPresendInGroup, invitationAlreadyPresent, requesterAndUserCantBeSame } = require('../../../const/responseCodes');
-const { fcUsersDB, fcGroupsDB } = require('../../../services');
+const { fcUsersDB, fcGroupsDB, FcChatDB } = require('../../../services');
 const FcError = require('../../../utils/error');
 
 
 // Add invitation in fc_user db 
 const addInvitation = async (req, res) => {
-
     try {
         const { userFcId, groupId, requester } = req.body;
 
@@ -86,4 +85,32 @@ const addInvitation = async (req, res) => {
 
 }
 
-module.exports = { addInvitation }
+const handleNewGroup = async (req, res) => {
+    try {
+        const { userFcId, groupId } = req.body;
+        if (!userFcId || !groupId) {
+            throw new FcError(requiredFieldsMissing, 404);
+        }
+
+        //checking if user exist with userFcId
+        const fcUser = await fcUsersDB.getFcUserById(userFcId);
+        if (!fcUser || fcUser.error === 'not_found') {
+            throw new FcError(userNotFound, 404);
+        }
+
+        //checking if group exist with groupId
+        const fcGroup = await fcGroupsDB.getGroupById(groupId);
+        if (!fcGroup || fcGroup.error === 'not_found') {
+            throw new FcError(groupNotFound, 404);
+        }
+        
+        const fcChatDb = new FcChatDB(groupId, userFcId);
+        await fcChatDb.createDatabase();
+
+        res.locals.send('ok');
+    } catch (err) {
+        res.locals.error(err)
+    }
+}
+
+module.exports = { addInvitation, handleNewGroup }
